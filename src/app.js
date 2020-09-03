@@ -66,7 +66,7 @@ const deleteWrapper = async (oAuth2Client) => {
 };
 
 const deleteTaskScheduler = (oAuth2Client) => {
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("0,30 * * * * *", async () => {
     await deleteWrapper(oAuth2Client);
   });
 };

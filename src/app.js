@@ -11,15 +11,21 @@ const FILTER_FILE = path.join(__dirname, "filterlist.txt");
 
 const SCOPES = ["https://mail.google.com/"];
 
-const deleteWrapper = async () => {
+const getAuthClient = async (deleteTaskScheduler) => {
   try {
     logger.info("Initalizing the deletion process\n");
     const credentials = await gmail.getCredentials(CREDENTIALS_JSON);
     logger.info("Authorizing with Google\n");
     const oAuth2Client = await gmail.authorize(credentials, TOKEN_JSON, SCOPES);
+    deleteTaskScheduler(oAuth2Client);
+  } catch (err) {
+    logger.error(err.stack);
+  }
+};
 
+const deleteWrapper = async (oAuth2Client) => {
+  try {
     logger.info("Scanning mails to be deleted\n");
-
     const filterList = reader.getFilterList(FILTER_FILE);
     const deletedMailsTrack = [];
     logger.info("Preparing to delete mails now");
@@ -59,6 +65,10 @@ const deleteWrapper = async () => {
   }
 };
 
-cron.schedule("* * * * *", async () => {
-  await deleteWrapper();
-});
+const deleteTaskScheduler = (oAuth2Client) => {
+  cron.schedule("* * * * *", async () => {
+    await deleteWrapper(oAuth2Client);
+  });
+};
+
+getAuthClient(deleteTaskScheduler);

@@ -7,7 +7,8 @@ const logger = require("../utils/logger");
 const getFreshToken = async (oAuth2Client, SCOPES, tokenPath) => {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: "offline",
-    scope: SCOPES
+    scope: SCOPES,
+    prompt: "consent"
   });
 
   logger.info("Authorize this app by visiting this URL \n");

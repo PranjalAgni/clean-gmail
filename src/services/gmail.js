@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 const fs = require("fs");
+const chalk = require("chalk");
 const { google } = require("googleapis");
 const readline = require("readline");
 const logger = require("../utils/logger");
@@ -11,8 +12,8 @@ const getFreshToken = async (oAuth2Client, SCOPES, tokenPath) => {
     prompt: "consent"
   });
 
-  logger.info("Authorize this app by visiting this URL \n");
-  logger.info(authUrl);
+  logger.info("Authorize this app by visiting this URL: ");
+  logger.links(authUrl);
 
   const readToken = readline.createInterface({
     input: process.stdin,
@@ -20,22 +21,25 @@ const getFreshToken = async (oAuth2Client, SCOPES, tokenPath) => {
   });
 
   return new Promise((resolve, reject) => {
-    readToken.question("Enter the code from that page here: ", (code) => {
-      readToken.close();
-      oAuth2Client.getToken(code, (err, token) => {
-        if (err) {
-          return reject(err.message);
-        }
-        oAuth2Client.setCredentials(token);
-        fs.writeFile(tokenPath, JSON.stringify(token), (error) => {
-          if (error) {
+    readToken.question(
+      chalk.cyan("Enter the code from that page here:"),
+      (code) => {
+        readToken.close();
+        oAuth2Client.getToken(code, (err, token) => {
+          if (err) {
             return reject(err.message);
           }
-          logger.info("Token stored in: ", tokenPath);
-          resolve();
+          oAuth2Client.setCredentials(token);
+          fs.writeFile(tokenPath, JSON.stringify(token), (error) => {
+            if (error) {
+              return reject(err.message);
+            }
+            logger.info("Token stored in: ", tokenPath);
+            resolve();
+          });
         });
-      });
-    });
+      }
+    );
   });
 };
 

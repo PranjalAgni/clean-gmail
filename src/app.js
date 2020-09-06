@@ -1,6 +1,8 @@
 /* eslint-disable no-await-in-loop */
 const path = require("path");
 const cron = require("node-cron");
+const chalk = require("chalk");
+const ora = require("ora");
 const gmail = require("./services/gmail");
 const reader = require("./services/reader");
 const logger = require("./utils/logger");
@@ -13,9 +15,8 @@ const SCOPES = ["https://mail.google.com/"];
 
 const getAuthClient = async (deleteTaskScheduler) => {
   try {
-    logger.info("Initalizing the deletion process\n");
+    logger.info("✔ Authorizing identity with Google");
     const credentials = await gmail.getCredentials(CREDENTIALS_JSON);
-    logger.info("Authorizing with Google\n");
     const oAuth2Client = await gmail.authorize(credentials, TOKEN_JSON, SCOPES);
     deleteTaskScheduler(oAuth2Client);
   } catch (err) {
@@ -24,12 +25,14 @@ const getAuthClient = async (deleteTaskScheduler) => {
 };
 
 const deleteWrapper = async (oAuth2Client) => {
+  let deleteSpinner = null;
   try {
-    logger.info("Scanning mails to be deleted\n");
+    logger.info("✔ Scanning mails to be deleted");
     const filterList = reader.getFilterList(FILTER_FILE);
     const deletedMailsTrack = [];
-    logger.info("Preparing to delete mails now");
+    deleteSpinner = ora(chalk.cyan("Starting to delete mails")).start();
     filterList.forEach(async (filterItem) => {
+      deleteSpinner.clear();
       let mailIdCollection = [];
       const { mails, token } = await gmail.getMailsByFilter(
         oAuth2Client,
@@ -56,16 +59,20 @@ const deleteWrapper = async (oAuth2Client) => {
       });
 
       if (deletedMailsTrack.length === filterList.length) {
-        logger.info("Deleted mails summary \n\n ");
+        deleteSpinner.succeed();
+        logger.info("✔ Deleted mails summary \n\n ");
         console.table(deletedMailsTrack);
       }
     });
   } catch (err) {
+    deleteSpinner.fail();
     logger.error(err.stack);
   }
 };
 
 const deleteTaskScheduler = (oAuth2Client) => {
+  // JS cron expression also has optional parmaeter for seconds
+  // Runs every 30 seconds
   cron.schedule("0,30 * * * * *", async () => {
     await deleteWrapper(oAuth2Client);
   });

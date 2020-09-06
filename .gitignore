@@ -116,5 +116,4 @@ dist
 .pnp.*
 credentials.json
 token.json
-filterlist.txt
 playground

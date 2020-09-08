@@ -1,7 +1,7 @@
 ### A Node.js service which permanently delete unwanted mails in minutes :rocket:
 
 <p align="center">
-  <img src="https://im4.ezgif.com/tmp/ezgif-4-d9062a5c8757.gif" alt="clean gmail demo gif" />
+  <img src="https://user-images.githubusercontent.com/26196076/92521069-3cc83480-f23a-11ea-9846-737eb02d3880.gif" alt="clean gmail demo gif" />
 </p>
 
 ## Table of Contents

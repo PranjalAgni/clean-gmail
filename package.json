@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "chalk": "^4.1.0",
-    "googleapis": "^59.0.0",
+    "googleapis": "^66.0.0",
     "n-readlines": "^1.0.0",
     "node-cron": "^2.0.3",
     "ora": "^5.0.0",

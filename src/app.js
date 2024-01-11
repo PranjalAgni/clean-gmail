@@ -50,6 +50,11 @@ const deleteWrapper = async (oAuth2Client) => {
 
         nextToken = nextPageData.token;
         mailIdCollection = mailIdCollection.concat(nextPageData.mails);
+        if (mailIdCollection.length > 1000) {
+          // There is a gmail hard limit of 1000 mails to be deleted in batch
+          mailIdCollection = mailIdCollection.slice(0, 900);
+          break;
+        }
       }
 
       await gmail.deleteMailsBatch(oAuth2Client, mailIdCollection);
@@ -61,6 +66,7 @@ const deleteWrapper = async (oAuth2Client) => {
       if (deletedMailsTrack.length === filterList.length) {
         deleteSpinner.succeed();
         logger.info("✔ Deleted mails summary \n\n ");
+        // eslint-disable-next-line no-console
         console.table(deletedMailsTrack);
       }
     });
@@ -71,7 +77,7 @@ const deleteWrapper = async (oAuth2Client) => {
 };
 
 const deleteTaskScheduler = (oAuth2Client) => {
-  // JS cron expression also has optional parmaeter for seconds
+  // JS cron expression also has optional parameter for seconds
   // Runs every 30 seconds
   cron.schedule("0,30 * * * * *", async () => {
     await deleteWrapper(oAuth2Client);

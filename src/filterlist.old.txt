@@ -1,0 +1,8 @@
+from:noreply@highradius.com
+from:no-reply@highradius.com
+from:support@highradius.com
+from:ossecm@prasterisk-tovo1.highradius.com
+from:asterisk-monitoring@highradius.com
+from:fail2ban.us-prod@highradius.com
+from:infra.monitoring@highradius.com
+from:mail@email.adobe.com

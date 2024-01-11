@@ -1,0 +1,7 @@
+1- token.json is automatically generated, just delete it if the file exists, run command `npm run start` it will navigate you to OAUTH2 consent screen chosse the gmail account and you will end up on a page with URL something like:
+
+http://localhost:3030/oauth/google/callback?code=<LONG_WEIRD_CODE>&scope=https://mail.google.com/
+
+2- Just paste the code in the terminal, and it googleapis will automatically generate the token.json file
+
+3- Maximum 1000 mails can be deleted at once (GMAIL limit: 'Too many message ids in request; max 1000')

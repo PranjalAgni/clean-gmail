@@ -12,6 +12,7 @@ module.exports = {
     quotes: ["error", "double"],
     "comma-dangle": ["error", "never"],
     camelcase: "off",
-    "arrow-body-style": "off"
+    "arrow-body-style": "off",
+    "no-restricted-syntax": "off"
   }
 };

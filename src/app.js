@@ -25,14 +25,17 @@ const getAuthClient = async (deleteTaskScheduler) => {
 };
 
 const deleteWrapper = async (oAuth2Client) => {
+  /**
+   * @type {ora.Ora | null}
+   */
   let deleteSpinner = null;
   try {
     logger.info("✔ Scanning mails to be deleted");
     const filterList = reader.getFilterList(FILTER_FILE);
     const deletedMailsTrack = [];
     deleteSpinner = ora(chalk.cyan("Starting to delete mails")).start();
-    filterList.forEach(async (filterItem) => {
-      deleteSpinner.clear();
+
+    for (const filterItem of filterList) {
       let mailIdCollection = [];
       const { mails, token } = await gmail.getMailsByFilter(
         oAuth2Client,
@@ -69,7 +72,7 @@ const deleteWrapper = async (oAuth2Client) => {
         // eslint-disable-next-line no-console
         console.table(deletedMailsTrack);
       }
-    });
+    }
   } catch (err) {
     deleteSpinner.fail();
     logger.error(err.stack);

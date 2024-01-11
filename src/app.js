@@ -37,28 +37,22 @@ const deleteWrapper = async (oAuth2Client) => {
 
     for (const filterItem of filterList) {
       let mailIdCollection = [];
-      const { mails, token } = await gmail.getMailsByFilter(
-        oAuth2Client,
-        filterItem
-      );
-
-      mailIdCollection = mailIdCollection.concat(mails);
-      let nextToken = token;
-      while (nextToken) {
-        const nextPageData = await gmail.getMailsByFilter(
+      let nextPageToken = null;
+      do {
+        const { mails, token } = await gmail.getMailsByFilter(
           oAuth2Client,
-          filterList,
-          nextToken
+          filterItem,
+          nextPageToken
         );
 
-        nextToken = nextPageData.token;
-        mailIdCollection = mailIdCollection.concat(nextPageData.mails);
+        mailIdCollection = mailIdCollection.concat(mails);
         if (mailIdCollection.length > 1000) {
           // There is a gmail hard limit of 1000 mails to be deleted in batch
           mailIdCollection = mailIdCollection.slice(0, 900);
           break;
         }
-      }
+        nextPageToken = token;
+      } while (nextPageToken);
 
       await gmail.deleteMailsBatch(oAuth2Client, mailIdCollection);
       deletedMailsTrack.push({
